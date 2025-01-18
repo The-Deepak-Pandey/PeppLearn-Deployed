@@ -6,7 +6,6 @@ function App() {
 
   return (
     <main>
-      <Button>Let's build lms</Button>
       <Login />
     </main>
   )
