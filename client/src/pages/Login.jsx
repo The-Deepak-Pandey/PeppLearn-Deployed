@@ -21,6 +21,8 @@ import { useEffect, useState } from "react"
 import { useRegisterUserMutation, useLoginUserMutation } from "@/features/api/authApi"
 import { use } from "react"
 import { Loader2 } from "lucide-react"
+import { toast } from "sonner"
+import { useNavigate } from "react-router-dom"
 
 const Login = () => {
 
@@ -29,6 +31,8 @@ const Login = () => {
 
     const [registerUser, { data: registerData, error: registerError, isLoading: registerLoading, isSuccess: registerIsSuccess }] = useRegisterUserMutation();
     const [loginUser, {data: loginData, error: loginError, isLoading: loginLoading, isSuccess: loginIsSuccess}] = useLoginUserMutation();
+
+    const navigate = useNavigate();
 
     const changeInputHandler = (e, type) => {
         const { name, value } = e.target;
@@ -40,7 +44,19 @@ const Login = () => {
     }
 
     useEffect(() => {
-        
+        if(registerIsSuccess && registerData){
+            toast.success(registerData.message || "User registered successfully");
+        }
+        if(registerError){
+            toast.error(registerError.message || "Failed to register user");
+        }
+        if(loginIsSuccess && loginData){
+            toast.success(loginData.message || "Welcome back");
+            navigate("/");
+        }
+        if(loginError){
+            toast.error(loginError.message || "Failed to login user");
+        }
     }, [loginLoading, registerLoading, loginData, registerData, loginError, registerError]);
 
     const handleRegistration = async (type) => {
@@ -50,7 +66,7 @@ const Login = () => {
     }
 
     return (
-        <div className="flex justify-center items-center w-full">
+        <div className="flex justify-center items-center w-full mt-28">
             <Tabs defaultValue="signup" className="w-[400px]">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="signup">Signup</TabsTrigger>
