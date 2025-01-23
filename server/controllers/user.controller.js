@@ -138,7 +138,7 @@ export const updateProfile = async (req, res) => {
         //upload new image to cloudinary
 
         const cloudResponse = await uploadMedia(profilePhoto.path);
-        const {secure_url: photoUrl} = cloudResponse;
+        const photoUrl = cloudResponse.secure_url;
 
         const updatedData = {name, photoUrl};
 
