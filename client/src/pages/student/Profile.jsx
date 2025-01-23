@@ -1,21 +1,51 @@
+import React, { useEffect, useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2 } from 'lucide-react'
-import React from 'react'
 import Course from './Course'
-import { useLoadUserQuery } from '@/features/api/authApi'
+import { useLoadUserQuery, useUpdateUserMutation } from '@/features/api/authApi'
+import { toast } from 'sonner'
 
 const Profile = () => {
 
+    const [name, setName] = useState('');
+    const [profilePhoto, setProfilePhoto] = useState("");
+
     const {data, isLoading} = useLoadUserQuery();
+
+    const [updateUser, {data: updateUserData, isLoading: updateUserIsLoading, isError, error, isSuccess}] = useUpdateUserMutation();
+
+    const onChangeHandler = (e) => {
+        const file = e.target.files?.[0];
+        if(file) setProfilePhoto(file);
+    }
+
+    
+
+    const updateUserHandler = async () => {
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('profilePhoto', profilePhoto);
+        await updateUser(formData);
+    };
+
+    useEffect(() => {
+        if(isSuccess){
+            toast.success(data.message || "Profile Updated Successfully");
+        }
+        if(isError){
+            toast.error(error.message || "Failed to update profile");
+        }
+
+    }, [error, data, isSuccess, isError]);
 
     if(isLoading) return <h1>Loading...</h1>
 
     const {user} = data;
-    
+
 
     return (
         <div className='my-24 max-w-4xl mx-auto px-4'>
@@ -57,15 +87,15 @@ const Profile = () => {
                             <div className='grid gap-4 py-4'>
                                 <div className='grid grid-cols-4 items-center gap-4'>
                                     <Label>Name</Label>
-                                    <Input type='text' placeholder='Change your name' className='col-span-3' />
+                                    <Input type='text' value={name} onChange={(e)=>setName(e.target.value)} placeholder='Change your name' className='col-span-3' />
                                 </div>
                                 <div className='grid grid-cols-4 items-center gap-4'>
                                     <Label>Profile Pic</Label>
-                                    <Input type='file' accept="image/*" className='col-span-3' />
+                                    <Input onChange = {onChangeHandler} type='file' accept="image/*" className='col-span-3' />
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button disabled={isLoading}>
+                                <Button disabled={isLoading} onClick={updateUserHandler}>
                                     {
                                         isLoading ? (
                                             <>
@@ -97,4 +127,4 @@ const Profile = () => {
     )
 }
 
-export default Profile
+export default Profile;
