@@ -14,16 +14,16 @@ const Profile = () => {
     const [name, setName] = useState('');
     const [profilePhoto, setProfilePhoto] = useState("");
 
-    const {data, isLoading} = useLoadUserQuery();
+    const { data, isLoading, refetch } = useLoadUserQuery();
 
-    const [updateUser, {data: updateUserData, isLoading: updateUserIsLoading, isError, error, isSuccess}] = useUpdateUserMutation();
+    const [updateUser, { data: updateUserData, isLoading: updateUserIsLoading, isError, error, isSuccess }] = useUpdateUserMutation();
 
     const onChangeHandler = (e) => {
         const file = e.target.files?.[0];
-        if(file) setProfilePhoto(file);
+        if (file) setProfilePhoto(file);
     }
 
-    
+
 
     const updateUserHandler = async () => {
         const formData = new FormData();
@@ -33,18 +33,23 @@ const Profile = () => {
     };
 
     useEffect(() => {
-        if(isSuccess){
+        refetch();
+    }, [])
+
+    useEffect(() => {
+        if (isSuccess) {
+            refetch();
             toast.success(data.message || "Profile Updated Successfully");
         }
-        if(isError){
+        if (isError) {
             toast.error(error.message || "Failed to update profile");
         }
 
-    }, [error, data, isSuccess, isError]);
+    }, [error, updateUserData, isSuccess, isError]);
 
-    if(isLoading) return <h1>Loading...</h1>
+    if (isLoading) return <h1>Loading...</h1>
 
-    const {user} = data;
+    const user = data && data.user;
 
 
     return (
@@ -53,7 +58,7 @@ const Profile = () => {
             <div className='flex flex-col md:flex-row items-center md:items-start gap-8 my-5'>
                 <div className='flex flex-col items-center'>
                     <Avatar className="h-24 w-24 md:h-32 md:w-32 mb-4">
-                        <AvatarImage src={user.photoUrl || "https://github.com/shadcn.png"} />
+                        <AvatarImage src={user?.photoUrl || "https://github.com/shadcn.png"} />
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                 </div>
@@ -87,17 +92,17 @@ const Profile = () => {
                             <div className='grid gap-4 py-4'>
                                 <div className='grid grid-cols-4 items-center gap-4'>
                                     <Label>Name</Label>
-                                    <Input type='text' value={name} onChange={(e)=>setName(e.target.value)} placeholder='Change your name' className='col-span-3' />
+                                    <Input type='text' value={name} onChange={(e) => setName(e.target.value)} placeholder='Change your name' className='col-span-3' />
                                 </div>
                                 <div className='grid grid-cols-4 items-center gap-4'>
                                     <Label>Profile Pic</Label>
-                                    <Input onChange = {onChangeHandler} type='file' accept="image/*" className='col-span-3' />
+                                    <Input onChange={onChangeHandler} type='file' accept="image/*" className='col-span-3' />
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button disabled={isLoading} onClick={updateUserHandler}>
+                                <Button disabled={updateUserIsLoading} onClick={updateUserHandler}>
                                     {
-                                        isLoading ? (
+                                        updateUserIsLoading ? (
                                             <>
                                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please Wait
                                             </>
@@ -117,7 +122,7 @@ const Profile = () => {
                             <h1>You are not enrolled in any of the courses</h1>
                         ) : (
                             user.enrolledCourses.map((course) => (
-                                <Course course = {course} key={course._id} />
+                                <Course course={course} key={course._id} />
                             ))
                         )
                     }
