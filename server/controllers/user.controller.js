@@ -116,44 +116,64 @@ export const getUserProfile = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
     try {
-        const userId = req.id;
-        const { name } = req.body;
-        const profilePhoto = req.file;
-
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({
-                msg: "User not found",
-                success: false,
-            });
-        }
-
-        // extract public id of the old image from the url if it exists
-
-        if(user.photoUrl){
-            const publicId = user.photoUrl.split("/").pop().split(".")[0]; //extract public id
-            deleteMediaFromCloudinary(publicId);
-        }
-
-        //upload new image to cloudinary
-
-        const cloudResponse = await uploadMedia(profilePhoto.path);
-        const photoUrl = cloudResponse.secure_url;
-
-        const updatedData = {name, photoUrl};
-
-        const updatedUser = await User.findByIdAndUpdate(userId, updatedData, {new: true}).select("-password");
-
-        return res.status(200).json({
-            success: true,
-            user: updatedUser,
-            message: "Profile updated successfully"
+      const userId = req.id;
+      const { name } = req.body;
+      const profilePhoto = req.file;
+  
+      // Check if a file was uploaded
+      if (!profilePhoto) {
+        return res.status(400).json({
+          success: false,
+          msg: "No file uploaded",
         });
-    } catch (error) {
-        console.log(error);
+      }
+  
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({
+          msg: "User not found",
+          success: false,
+        });
+      }
+  
+      // Delete old image if it exists
+      if (user.photoUrl) {
+        const publicId = user.photoUrl.split("/").pop().split(".")[0];
+        await deleteMediaFromCloudinary(publicId);
+      }
+  
+      // Upload new image to Cloudinary
+      let cloudResponse;
+      try {
+        cloudResponse = await uploadMedia(profilePhoto.path);
+        if (!cloudResponse?.secure_url) {
+          throw new Error("Cloudinary upload failed");
+        }
+      } catch (uploadError) {
+        console.error("Cloudinary Error:", uploadError);
         return res.status(500).json({
-            success: false,
-            msg: "Failed to update user profile"
+          success: false,
+          msg: "Failed to upload image to Cloudinary",
         });
+      }
+  
+      const photoUrl = cloudResponse.secure_url;
+      const updatedData = { name, photoUrl };
+  
+      const updatedUser = await User.findByIdAndUpdate(userId, updatedData, {
+        new: true,
+      }).select("-password");
+  
+      return res.status(200).json({
+        success: true,
+        user: updatedUser,
+        message: "Profile updated successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        success: false,
+        msg: "Failed to update user profile",
+      });
     }
-}
+  };
