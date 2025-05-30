@@ -50,7 +50,7 @@ export const getCreatorCourses = async (req, res) => {
 export const editCourse = async (req, res) => {
     try {
         const courseId = req.params.courseId;
-        const { courseTitle, subTitle, description, category, courseLevel, coursePrice } = req.body;
+        const { courseTitle, subtitle, description, category, courseLevel, coursePrice } = req.body;
         const thumbnail = req.file;
 
         let course = await Course.findById(courseId);
@@ -73,7 +73,7 @@ export const editCourse = async (req, res) => {
             courseThumbnail = await uploadMedia(thumbnail.path);
         }
 
-        const updateData = { courseTitle, subTitle, description, category, courseLevel, coursePrice, courseThumbnail: courseThumbnail?.secure_url };
+        const updateData = { courseTitle, subtitle, description, category, courseLevel, coursePrice, courseThumbnail: courseThumbnail?.secure_url };
 
         course = await Course.findByIdAndUpdate(courseId, updateData, { new: true });
 
