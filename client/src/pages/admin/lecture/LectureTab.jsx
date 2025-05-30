@@ -134,8 +134,13 @@ const LectureTab = () => {
                 }
 
                 <div className='mt-4'>
-                    <Button onClick={editLectureHandler}>
-                        Update Lecture
+                    <Button disabled={isLoading} onClick={editLectureHandler}>
+                        {
+                            isLoading ? <>
+                                <Loader2 className='mr-2 h-4 w-4 animate-apin' />
+                                Please Wait
+                            </> : "Update Lecture"
+                        }
                     </Button>
                 </div>
             </CardContent>
