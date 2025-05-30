@@ -28,12 +28,18 @@ export const courseApi = createApi({
         editCourse: builder.mutation({
             query: ({formData, courseId}) => ({
                 url: `/${courseId}`,
+                method: "GET",
+            })
+        }),
+        getCourseById: builder.query({
+            query: (courseId) => ({
+                url: `/${courseId}`,
                 method: "PUT",
                 body: formData
             })
-        })
+        }),
     }),
 })
 
-export const { useCreateCourseMutation, useGetCreatorCourseQuery, useEditCourseMutation } = courseApi;
+export const { useCreateCourseMutation, useGetCreatorCourseQuery, useEditCourseMutation, useGetCourseByIdQuery } = courseApi;
 
