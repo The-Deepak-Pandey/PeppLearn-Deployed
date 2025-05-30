@@ -103,7 +103,8 @@ export const getCourseById = async (req, res) => {
         }
         
         return res.status(200).json({
-            course
+            course,
+            message:"Course found!"
         })
 
     } catch (error) {
