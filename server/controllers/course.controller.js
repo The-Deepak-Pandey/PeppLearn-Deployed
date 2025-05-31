@@ -184,9 +184,9 @@ export const editLecture = async (req, res) => {
 
         // update lecture
         if (lectureTitle) lecture.lectureTitle = lectureTitle;
-        if (videoInfo.videoUrl) lecture.videoUrl = videoInfo.videoUrl;
-        if (videoInfo.publicId) lecture.publicId = videoInfo.publicId;
-        if (isPreviewFree) lecture.isPreviewFree = isPreviewFree;
+        if (videoInfo?.videoUrl) lecture.videoUrl = videoInfo.videoUrl; 
+        if (videoInfo?.publicId) lecture.publicId = videoInfo.publicId;
+        lecture.isPreviewFree = isPreviewFree;
 
         await lecture.save();
 
@@ -205,7 +205,7 @@ export const editLecture = async (req, res) => {
     } catch (error) {
         console.log(error);
         return res.status(500).json({
-            message: "Failed to get lecture"
+            message: "Failed to edit lecture"
         })
     }
 }
