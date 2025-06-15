@@ -91,7 +91,7 @@ const CourseProgress = () => {
         >
           {completed ? (
             <div className="flex items-center">
-              <CheckCircle className="h-4 w-4 mr-2" /> <span>Completed</span>{" "}
+              <CheckCircle className="h-4 w-4 mr-2" /> <span>Completed.</span>{" "}
             </div>
           ) : (
             "Mark as completed"
