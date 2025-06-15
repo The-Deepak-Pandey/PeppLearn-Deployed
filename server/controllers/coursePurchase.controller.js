@@ -3,6 +3,7 @@ import { Course } from "../models/course.model.js";
 import { CoursePurchase } from "../models/coursePurchase.model.js";
 import { Lecture } from "../models/lecture.model.js";
 import { User } from "../models/user.model.js";
+import mongoose from "mongoose";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -137,3 +138,58 @@ export const stripeWebhook = async (req, res) => {
     }
     res.status(200).send();
 };
+
+export const getCourseDetailWithPurchaseStatus = async (req, res) => {
+    try {
+        const { courseId } = req.params;
+        const userId = req.id;
+
+        if (!courseId || courseId === 'undefined') {
+            console.error("Invalid course ID:", courseId);
+            return res.status(400).json({ message: 'Invalid course ID' });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(courseId)) {
+            console.error("Invalid ObjectId format for courseId:", courseId);
+            return res.status(400).json({ message: 'Invalid ObjectId format' });
+        }
+
+        const course = await Course.findById(courseId)
+            .populate({ path: "creator" })
+            .populate({ path: "lectures" });
+
+
+        const purchased = await CoursePurchase.findOne({ userId, courseId });
+
+        if (!course) {
+            console.error("Course not found");
+            return res.status(404).json({ message: "Course not found!!!" });
+        }
+
+        return res.status(200).json({
+            course,
+            purchased: purchased ? true : false, // Check if the user has purchased the course
+        });
+
+    } catch (error) {
+        console.error("Error fetching course details:", error);
+    }
+};
+
+export const getAllPurchasedCourse = async (_, res) => {
+    try {
+        const purchasedCourse = await CoursePurchase.find({ status: "completed" }).populate("courseId");
+
+        if (!purchasedCourse) {
+            return res.status(404).json({ purchasedCourse: [] });
+        }
+
+        return res.status(200).json({
+            success: true,
+            purchasedCourse,
+        });
+
+    } catch (error) {
+
+    }
+}
