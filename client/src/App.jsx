@@ -19,6 +19,7 @@ import EditLecture from './pages/admin/lecture/EditLecture'
 import CourseDetail from './pages/student/CourseDetail'
 import CourseProgress from './pages/student/CourseProgress'
 import SearchPage from './pages/student/SearchPage'
+import { AdminRoute, AuthenticatedUser, ProtectedRoute } from './components/ProtectedRoute'
 
 const appRouter = createBrowserRouter([
   {
@@ -34,35 +35,35 @@ const appRouter = createBrowserRouter([
       },
       {
         path: "login",
-        element: <Login />
+        element: <AuthenticatedUser> <Login /> </AuthenticatedUser>
       },
       {
         path: "my-learning",
-        element : <MyLearning />
+        element: <ProtectedRoute> <MyLearning /> </ProtectedRoute>
       },
       {
         path: "profile",
-        element: <Profile />
+        element: <ProtectedRoute> <Profile /> </ProtectedRoute>
       },
       {
         path: "course/search",
-        element: <SearchPage />
+        element: <ProtectedRoute> <SearchPage /> </ProtectedRoute>
       },
       {
-        path:"course-detail/:courseId",
-        element:<CourseDetail />
+        path: "course-detail/:courseId",
+        element: <ProtectedRoute> <CourseDetail /> </ProtectedRoute>
       },
       {
-        path:"course-progress/:courseId",
-        element:<CourseProgress />
+        path: "course-progress/:courseId",
+        element: <ProtectedRoute> <CourseProgress /> </ProtectedRoute>
       },
 
       // Admin routes can be added here
 
       {
         path: "admin",
-        element: <Sidebar />,
-        children:[
+        element: <AdminRoute> <Sidebar /> </AdminRoute>,
+        children: [
           {
             path: "dashboard",
             element: <Dashboard />
@@ -88,7 +89,7 @@ const appRouter = createBrowserRouter([
             element: <EditLecture />
           },
         ]
-      }      
+      }
     ]
   }
 ])
