@@ -19,7 +19,7 @@ export const uploadMedia = async (fileBuffer) => {
             }
         );
 
-        Readable.from(fileBuffer).pipe(stream);
+        Readable.from(fileBuffer).pipe(stream); 
     });
 };
 
