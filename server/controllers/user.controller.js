@@ -145,7 +145,7 @@ export const updateProfile = async (req, res) => {
         // Upload new image to Cloudinary
         let cloudResponse;
         try {
-            cloudResponse = await uploadMedia(profilePhoto.path);
+            cloudResponse = await uploadMedia(profilePhoto.buffer); // ✅ works with in-memory file
             if (!cloudResponse?.secure_url) {
                 throw new Error("Cloudinary upload failed");
             }

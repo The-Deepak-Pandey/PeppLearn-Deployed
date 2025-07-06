@@ -8,16 +8,19 @@ cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
 });
 
-export const uploadMedia = async (file) => {
-    try {
-        const uploadResponse = await cloudinary.uploader.upload(file, {
-            resource_type: "auto",
-        });
-        return uploadResponse;
-    } catch (error) {
-        console.log(error);
-    }
-}
+export const uploadMedia = async (fileBuffer) => {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            { resource_type: 'auto' },
+            (error, result) => {
+                if (error) return reject(error);
+                resolve(result);
+            }
+        );
+
+        Readable.from(fileBuffer).pipe(stream);
+    });
+};
 
 export const deleteMediaFromCloudinary = async (publicId) => {
     try {
